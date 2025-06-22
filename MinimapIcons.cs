@@ -229,9 +229,9 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
 
     public override void Render()
     {
-        if (_largeMap == null || 
+        if (_largeMap == null ||
             !GameController.InGame ||
-            Settings.DrawOnlyOnLargeMap && _largeMap != true) 
+            Settings.DrawOnlyOnLargeMap && _largeMap != true)
             return;
 
         if (!Settings.IgnoreFullscreenPanels &&
@@ -255,6 +255,9 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
             if (icon?.Entity == null) continue;
 
             if (!Settings.DrawMonsters && icon.Entity.Type == EntityType.Monster)
+                continue;
+
+            if (Settings.IgnoreVolatileCores && icon.Entity.RenderName.Contains("Volatile Core"))
                 continue;
 
             if (IgnoreCache.GetOrAdd(icon.Entity.Path, () => Ignored.Any(x => icon.Entity.Path.StartsWith(x))))
@@ -284,7 +287,7 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
             var halfSize = size / 2f;
             icon.DrawRect = new RectangleF(position.X - halfSize, position.Y - halfSize, size, size);
             var drawRect = icon.DrawRect;
-            if (_largeMap == false && !_ingameUi.Map.SmallMiniMap.GetClientRectCache.Contains(drawRect)) 
+            if (_largeMap == false && !_ingameUi.Map.SmallMiniMap.GetClientRectCache.Contains(drawRect))
                 continue;
 
             Graphics.DrawImage(iconValueMainTexture.FileName, drawRect, iconValueMainTexture.UV, iconValueMainTexture.Color.ToSharpDx());

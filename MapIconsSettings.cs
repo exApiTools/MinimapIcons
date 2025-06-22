@@ -14,6 +14,7 @@ public class MapIconsSettings : ISettings
     public ToggleNode DrawReplacementsForGameIconsWhenOutOfRange { get; set; } = new ToggleNode(true);
     public ToggleNode IgnoreFullscreenPanels { get; set; } = new ToggleNode(false);
     public ToggleNode IgnoreLargePanels { get; set; } = new ToggleNode(false);
+    public ToggleNode IgnoreVolatileCores { get; set; } = new ToggleNode(true);
 
     [Menu("Cache breach entities", "Breaches spawn lots of entities, to avoid cluttering your minimap you can turn off this setting")]
     public ToggleNode CacheBreachEntities { get; set; } = new ToggleNode(true);
@@ -27,7 +28,7 @@ public class MapIconsSettings : ISettings
             Content =
             [
             ],
-            EnableControls = true, 
+            EnableControls = true,
             ItemFactory = () => new TextNode(""),
             UseFlatItems = true,
         };
