@@ -62,7 +62,7 @@ public class MonsterIcon : BaseIcon
             {
                 var objectMagicProperties = entity.GetComponent<ObjectMagicProperties>();
 
-                var mods = objectMagicProperties.Mods;
+                var mods = objectMagicProperties?.Mods;
 
                 if (mods != null)
                 {
