@@ -11,6 +11,7 @@ public class MapIconsSettings : ISettings
     public RangeNode<float> ZForText { get; set; } = new RangeNode<float>(-10, -50, 50);
     public ToggleNode DrawOnlyOnLargeMap { get; set; } = new ToggleNode(true);
     public ToggleNode DrawCachedEntities { get; set; } = new ToggleNode(true);
+    public ToggleNode DrawShrineNames { get; set; } = new ToggleNode(true);
     public ToggleNode DrawReplacementsForGameIconsWhenOutOfRange { get; set; } = new ToggleNode(true);
     public ToggleNode IgnoreFullscreenPanels { get; set; } = new ToggleNode(false);
     public ToggleNode IgnoreLargePanels { get; set; } = new ToggleNode(false);
@@ -26,6 +27,7 @@ public class MapIconsSettings : ISettings
         {
             Content =
             [
+                new TextNode("Metadata/Shrines/Shrine")
             ],
             EnableControls = true, 
             ItemFactory = () => new TextNode(""),

@@ -268,16 +268,19 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
             if (!icon.Show())
                 continue;
 
+            var iconGridPos = icon.GridPosition();
+            var position = _mapCenter +
+                           DeltaInWorldToMinimapDelta(iconGridPos - playerPos,
+                               (playerHeight + GameController.IngameState.Data.GetTerrainHeightAt(iconGridPos)) * PoeMapExtension.WorldToGridConversion);
+
+            if (Settings.DrawShrineNames && icon.Entity.Type == EntityType.Shrine && !string.IsNullOrEmpty(icon.Entity.RenderName))
+                Graphics.DrawText(icon.Entity.RenderName, position.Translate(0, Settings.ZForText), FontAlign.Center);
+
             if (icon.HasIngameIcon &&
                 icon is not CustomIcon &&
                 (!Settings.DrawReplacementsForGameIconsWhenOutOfRange || icon.Entity.IsValid) &&
                 !icon.Entity.Path.Contains("Metadata/Terrain/Leagues/Delve/Objects/DelveWall"))
                 continue;
-
-            var iconGridPos = icon.GridPosition();
-            var position = _mapCenter +
-                           DeltaInWorldToMinimapDelta(iconGridPos - playerPos,
-                               (playerHeight + GameController.IngameState.Data.GetTerrainHeightAt(iconGridPos)) * PoeMapExtension.WorldToGridConversion);
 
             var iconValueMainTexture = icon.MainTexture;
             var size = iconValueMainTexture.Size;
