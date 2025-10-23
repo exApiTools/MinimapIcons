@@ -2,6 +2,7 @@
 using ExileCore.Shared.Interfaces;
 using ExileCore.Shared.Nodes;
 using MinimapIcons.IconsBuilder;
+using MinimapIcons.IgnoreRules;
 
 namespace MinimapIcons;
 
@@ -14,7 +15,6 @@ public class MapIconsSettings : ISettings
     public ToggleNode DrawReplacementsForGameIconsWhenOutOfRange { get; set; } = new ToggleNode(true);
     public ToggleNode IgnoreFullscreenPanels { get; set; } = new ToggleNode(false);
     public ToggleNode IgnoreLargePanels { get; set; } = new ToggleNode(false);
-    public ToggleNode IgnoreVolatileCores { get; set; } = new ToggleNode(true);
 
     [Menu("Cache breach entities", "Breaches spawn lots of entities, to avoid cluttering your minimap you can turn off this setting")]
     public ToggleNode CacheBreachEntities { get; set; } = new ToggleNode(true);
@@ -32,6 +32,9 @@ public class MapIconsSettings : ISettings
             ItemFactory = () => new TextNode(""),
             UseFlatItems = true,
         };
+
+    [Menu("Custom Ignore Rules", CollapsedByDefault = true)]
+    public CustomIgnoreSettings CustomIgnoreSettings { get; set; } = new();
 
     public IconsBuilderSettings IconsBuilderSettings { get; set; } = new();
 }
