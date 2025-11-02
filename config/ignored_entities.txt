@@ -100,3 +100,6 @@ Metadata/Monsters/LeagueBestiary/ModDaemonCorpseEruption
 Metadata/Monsters/LeagueBestiary/ModDaemonSandLeaperExplode1
 Metadata/Monsters/LeagueBestiary/ModDaemonStampede1
 Metadata/Monsters/LeagueBestiary/ModDaemonGraspingPincers1
+
+#Breach2
+Metadata/MiscellaneousObjects/Brequel/BrequelSpawnerCover
