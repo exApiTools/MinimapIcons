@@ -29,21 +29,24 @@ public class LegionIcon : BaseIcon
     {
         MainTexture = new HudTexture("Icons.png");
 
-        (MainTexture.Size, Text) = Rarity switch
+        MainTexture.Size = Rarity switch
         {
-            MonsterRarity.White => (MainTexture.Size = settings.SizeEntityWhiteIcon, null),
-            MonsterRarity.Magic => (MainTexture.Size = settings.SizeEntityMagicIcon, null),
-            MonsterRarity.Rare => (MainTexture.Size = settings.SizeEntityRareIcon, null),
-            MonsterRarity.Unique => (MainTexture.Size = settings.SizeEntityUniqueIcon, entity.RenderName),
+            MonsterRarity.White => MainTexture.Size = settings.SizeEntityWhiteIcon,
+            MonsterRarity.Magic => MainTexture.Size = settings.SizeEntityMagicIcon,
+            MonsterRarity.Rare => MainTexture.Size = settings.SizeEntityRareIcon,
+            MonsterRarity.Unique => MainTexture.Size = settings.SizeEntityUniqueIcon,
             _ => throw new ArgumentException("Legion icon rarity corrupted.")
         };
 
-        if (entity.Path.StartsWith("Metadata/Monsters/LegionLeague/MonsterChest", StringComparison.Ordinal) || Rarity == MonsterRarity.Unique)
+        var isChest = entity.Path.StartsWith("Metadata/Monsters/LegionLeague/MonsterChest", StringComparison.Ordinal);
+        if (isChest || Rarity == MonsterRarity.Unique)
         {
             MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeGreenSquare);
             MainTexture.Color = Color.LimeGreen;
             Hidden = () => false;
-            Text = entity.RenderName;
+            if (isChest && settings.LegionSettings.ShowChestNames ||
+                !isChest && settings.LegionSettings.ShowUniqueMonsterNames)
+                Text = entity.RenderName;
 
             Show = () =>
             {
@@ -101,7 +104,8 @@ public class LegionIcon : BaseIcon
             if (statDictionary.TryGetValue(GameStat.MonsterMinimapIcon, out var indexMinimapIcon))
             {
                 var name = (MapIconsIndex) indexMinimapIcon;
-                Text = name.ToString().Replace("Legion", "");
+                if (settings.LegionSettings.ShowMonsterRewards)
+                    Text = name.ToString().Replace("Legion", "");
                 Priority = IconPriority.Critical;
 
                 var frozenCheck = new TimeCache<bool>(() =>

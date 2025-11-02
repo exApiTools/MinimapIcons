@@ -26,6 +26,8 @@ public class IconsBuilderSettings
     public ToggleNode UseReplacementsForGameIconsWhenOutOfRange { get; set; } = new ToggleNode(true);
     public ToggleNode UseReplacementsForItemIconsWhenOutOfRange { get; set; } = new ToggleNode(true);
 
+    public LegionSettings LegionSettings { get; set; } = new LegionSettings();
+
     [Menu("Default size")]
     public float SizeDefaultIcon { get; set; } = new RangeNode<int>(16, 1, 50);
 
@@ -77,6 +79,17 @@ public class IconsBuilderSettings
 
     public ContentNode<CustomIconSettings> CustomIcons { get; set; } = new ContentNode<CustomIconSettings> { ItemFactory = () => new CustomIconSettings(), };
 }
+
+[Submenu(CollapsedByDefault = false)]
+public class LegionSettings
+{
+    [Menu(null, "Disabling this means legion monsters are treated as any other monster")]
+    public ToggleNode ProcessSeparately { get; set; } = new ToggleNode(true);
+    public ToggleNode ShowUniqueMonsterNames { get; set; } = new ToggleNode(true);
+    public ToggleNode ShowChestNames { get; set; } = new ToggleNode(true);
+    public ToggleNode ShowMonsterRewards { get; set; } = new ToggleNode(true);
+}
+
 
 [Submenu(CollapsedByDefault = false)]
 public class MonsterNameSettings

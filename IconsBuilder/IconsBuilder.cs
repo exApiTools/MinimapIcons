@@ -172,7 +172,7 @@ public class IconsBuilder
         {
             if (!entity.IsAlive) return null;
 
-            if (entity.League == LeagueType.Legion)
+            if (entity.League == LeagueType.Legion && Settings.LegionSettings.ProcessSeparately)
                 return new LegionIcon(entity, Settings, AlertEntitiesWithIconSize);
             if (entity.League == LeagueType.Delirium)
                 return new DeliriumIcon(entity, Settings, AlertEntitiesWithIconSize);
