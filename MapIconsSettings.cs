@@ -26,6 +26,19 @@ public class MapIconsSettings : ISettings
         {
             Content =
             [
+                "Metadata/Terrain/Leagues/Delve/Objects/DelveWall"
+            ],
+            EnableControls = true, 
+            ItemFactory = () => new TextNode(""),
+            UseFlatItems = true,
+        };
+
+    [Menu(null, CollapsedByDefault = true)]
+    public ContentNode<TextNode> IgnoreHiddenStatusMinimapIcons { get; set; } =
+        new ContentNode<TextNode>()
+        {
+            Content =
+            [
             ],
             EnableControls = true, 
             ItemFactory = () => new TextNode(""),

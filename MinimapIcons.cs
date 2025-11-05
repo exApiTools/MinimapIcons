@@ -271,7 +271,7 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
             if (icon.HasIngameIcon &&
                 icon is not CustomIcon &&
                 (!Settings.DrawReplacementsForGameIconsWhenOutOfRange || icon.Entity.IsValid) &&
-                !icon.Entity.Path.Contains("Metadata/Terrain/Leagues/Delve/Objects/DelveWall"))
+                !Settings.AlwaysShownIngameIcons.Content.Any(x => global::MinimapIcons.IconsBuilder.IconsBuilder.GetRegex(x.Value).IsMatch(icon.Entity.Path)))
                 continue;
 
             var iconGridPos = icon.GridPosition();
