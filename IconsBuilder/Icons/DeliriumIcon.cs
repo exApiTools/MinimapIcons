@@ -65,7 +65,7 @@ internal class DeliriumIcon : BaseIcon
                 return;
             }
 
-            MainTexture.Size = settings.SizeEntityProximityMonsterIcon;
+            MainTexture.Size = settings.DeliriumMonsterIconSize;
             Hidden = () => false;
 
             Priority = IconPriority.Medium;

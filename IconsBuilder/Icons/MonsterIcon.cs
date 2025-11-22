@@ -72,6 +72,13 @@ public class MonsterIcon : BaseIcon
                 modName = mods.FirstOrDefault(modIcons.ContainsKey);
             }
 
+            if (settings.HighlightEldritchMonsters &&
+                (entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/BlackStarMonsters/", StringComparison.Ordinal) ||
+                 entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/CleansingMonsters/", StringComparison.Ordinal)))
+            {
+                BorderColor = settings.EldritchMonstersColor.Value.ToSystem();
+            }
+
             if (modName != null)
             {
                 MainTexture = new HudTexture("sprites.png");
