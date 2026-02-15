@@ -29,7 +29,7 @@ public class MiscIcon : BaseIcon
         }
         else
         {
-            MainTexture.Size = settings.SizeDefaultIcon;
+            MainTexture.Size = settings.MiscIngameIconSize;
             Text = RenderName;
             Priority = IconPriority.VeryHigh;
             if (entity.GetComponent<MinimapIcon>()?.Name is "DelveRobot") Text = "Follow Me";

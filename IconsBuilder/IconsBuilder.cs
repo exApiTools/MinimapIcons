@@ -130,13 +130,13 @@ public class IconsBuilder
         return false;
     }
 
-    private readonly ConditionalWeakTable<string, Regex> _regexes = [];
+    private static readonly ConditionalWeakTable<string, Regex> _regexes = [];
 
     private BaseIcon GenerateIcon(Entity entity)
     {
         var metadata = entity.Metadata;
         if (Settings.CustomIcons.Content
-                .FirstOrDefault(x => _regexes.GetValue(x.MetadataRegex.Value, p => new Regex(p))!.IsMatch(metadata)) is { } customIconConfig)
+                .FirstOrDefault(x => GetRegex(x.MetadataRegex.Value).IsMatch(metadata)) is { } customIconConfig)
         {
             return new CustomIcon(entity, Settings, customIconConfig);
         }
@@ -157,8 +157,9 @@ public class IconsBuilder
         }
 
         if (Settings.UseReplacementsForGameIconsWhenOutOfRange &&
-            entity.TryGetComponent<MinimapIcon>(out var minimapIconComponent) && 
-            !minimapIconComponent.IsHide)
+            entity.TryGetComponent<MinimapIcon>(out var minimapIconComponent) &&
+            (!minimapIconComponent.IsHide || _plugin.Settings.IgnoreHiddenStatusMinimapIcons.Content.Any(x => GetRegex(x.Value).IsMatch(entity.Path))) && 
+            !Settings.MonstersWithIcons.Content.Any(x => GetRegex(x.Value).IsMatch(entity.Path)))
         {
             var name = minimapIconComponent.Name;
             if (!string.IsNullOrEmpty(name))
@@ -172,7 +173,7 @@ public class IconsBuilder
         {
             if (!entity.IsAlive) return null;
 
-            if (entity.League == LeagueType.Legion)
+            if (entity.League == LeagueType.Legion && Settings.LegionSettings.ProcessSeparately)
                 return new LegionIcon(entity, Settings, AlertEntitiesWithIconSize);
             if (entity.League == LeagueType.Delirium)
                 return new DeliriumIcon(entity, Settings, AlertEntitiesWithIconSize);
@@ -225,5 +226,10 @@ public class IconsBuilder
             return new MiscIcon(entity, Settings);
 
         return null;
+    }
+
+    public static Regex GetRegex(string regex)
+    {
+        return _regexes.GetValue(regex, p => new Regex(p));
     }
 }

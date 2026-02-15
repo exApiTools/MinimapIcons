@@ -81,7 +81,7 @@ public ChestIcon(Entity entity, IconsBuilderSettings settings) : base(entity)
 
     public void Update(Entity entity, IconsBuilderSettings settings)
     {
-        if (Entity.Path.Contains("BreachChest"))
+        if (Entity.Path.StartsWith("Metadata/Chests/Breach/BreachBoxChest", StringComparison.Ordinal))
             CType = ChestType.Breach;
         else if (Entity.Path.Contains("Metadata/Chests/AbyssChest") ||
                  Entity.Path.Contains("Metadata/MiscellaneousObjects/Abyss/AbyssFinal") ||

@@ -53,6 +53,7 @@ public abstract class BaseIcon
     };
 
     protected bool _HasIngameIcon;
+    protected MapIconsIndex? IngameIconIndex;
 
     public BaseIcon(Entity entity)
     {
@@ -87,11 +88,11 @@ public abstract class BaseIcon
                 return;
             }
 
-            var iconIndexByName = ExileCore.Shared.Helpers.Extensions.IconIndexByName(name);
+            IngameIconIndex = ExileCore.Shared.Helpers.Extensions.IconIndexByName(name);
 
-            if (iconIndexByName != MapIconsIndex.MyPlayer)
+            if (IngameIconIndex.Value != MapIconsIndex.MyPlayer)
             {
-                MainTexture = new HudTexture("Icons.png") { UV = SpriteHelper.GetUV(iconIndexByName), Size = 16 };
+                MainTexture = new HudTexture("Icons.png") { UV = SpriteHelper.GetUV(IngameIconIndex.Value), Size = 16 };
                 _HasIngameIcon = true;
             }
 
@@ -115,6 +116,7 @@ public abstract class BaseIcon
     public Func<bool> Show { get; set; }
     public Func<bool> Hidden { get; protected set; } = () => false;
     public HudTexture MainTexture { get; protected set; }
+    public System.Drawing.Color? BorderColor { get; protected set; } = null;
     public IconPriority Priority { get; protected set; }
     public MonsterRarity Rarity { get; protected set; }
     public string Text { get; protected set; }
