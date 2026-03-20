@@ -74,7 +74,8 @@ public class MonsterIcon : BaseIcon
 
             if (settings.HighlightEldritchMonsters &&
                 (entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/BlackStarMonsters/", StringComparison.Ordinal) ||
-                 entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/CleansingMonsters/", StringComparison.Ordinal)))
+                 entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/CleansingMonsters/", StringComparison.Ordinal)||
+                 entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/DoomMonsters/", StringComparison.Ordinal)))
             {
                 BorderColor = settings.EldritchMonstersColor.Value.ToSystem();
             }
