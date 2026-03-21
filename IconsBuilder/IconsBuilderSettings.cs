@@ -1,4 +1,4 @@
-﻿using ExileCore;
+using ExileCore;
 using ExileCore.Shared.Attributes;
 using ExileCore.Shared.Enums;
 using ExileCore.Shared.Helpers;
@@ -124,6 +124,7 @@ public class CustomIconSettings
     public ToggleNode OnlyShowAlive { get; set; } = new(false);
     public ToggleNode OnlyShowNotOpened { get; set; } = new(false);
     public ToggleNode OnlyShowNonHiddenIcons { get; set; } = new(false);
+    public ToggleNode DisableDrawingHiddenIcon { get; set; } = new(false);
     [JsonConverter(typeof(StringEnumConverter))]
     public MapIconsIndex Icon;
 
