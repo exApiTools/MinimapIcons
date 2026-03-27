@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -158,8 +158,9 @@ public class IconsBuilder
 
         if (Settings.UseReplacementsForGameIconsWhenOutOfRange &&
             entity.TryGetComponent<MinimapIcon>(out var minimapIconComponent) &&
-            (!minimapIconComponent.IsHide || _plugin.Settings.IgnoreHiddenStatusMinimapIcons.Content.Any(x => GetRegex(x.Value).IsMatch(entity.Path))) && 
-            !Settings.MonstersWithIcons.Content.Any(x => GetRegex(x.Value).IsMatch(entity.Path)))
+            (!minimapIconComponent.IsHide || _plugin.Settings.IgnoreHiddenStatusMinimapIcons.Content.Any(x => GetRegex(x.Value).IsMatch(entity.Path))) &&
+            !Settings.MonstersWithIcons.Content.Any(x => GetRegex(x.Value).IsMatch(entity.Path)) &&
+            !(entity.Type == EntityType.Monster && _plugin.Settings.MonstersIgnoreMinimapIconComponent))
         {
             var name = minimapIconComponent.Name;
             if (!string.IsNullOrEmpty(name))
@@ -178,7 +179,7 @@ public class IconsBuilder
             if (entity.League == LeagueType.Delirium)
                 return new DeliriumIcon(entity, Settings, AlertEntitiesWithIconSize);
 
-            return new MonsterIcon(entity, Settings, AlertEntitiesWithIconSize);
+            return new MonsterIcon(entity, Settings, AlertEntitiesWithIconSize, _plugin.Settings);
         }
 
         //NPC

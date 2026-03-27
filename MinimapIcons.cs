@@ -271,7 +271,8 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
             if (icon.HasIngameIcon &&
                 icon is not CustomIcon &&
                 (!Settings.DrawReplacementsForGameIconsWhenOutOfRange || icon.Entity.IsValid) &&
-                !Settings.AlwaysShownIngameIcons.Content.Any(x => global::MinimapIcons.IconsBuilder.IconsBuilder.GetRegex(x.Value).IsMatch(icon.Entity.Path)))
+                !Settings.AlwaysShownIngameIcons.Content.Any(x => global::MinimapIcons.IconsBuilder.IconsBuilder.GetRegex(x.Value).IsMatch(icon.Entity.Path)) &&
+                !(icon.Entity.Type == EntityType.Monster && Settings.MonstersIgnoreMinimapIconComponent))
                 continue;
 
             var iconGridPos = icon.GridPosition();

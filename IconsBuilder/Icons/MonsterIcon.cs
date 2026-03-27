@@ -7,18 +7,19 @@ using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Enums;
 using ExileCore.Shared.Helpers;
 using GameOffsets.Native;
+using MinimapIcons;
 
 namespace MinimapIcons.IconsBuilder.Icons;
 
 public class MonsterIcon : BaseIcon
 {
-    public MonsterIcon(Entity entity, IconsBuilderSettings settings, Dictionary<string, Vector2i> modIcons)
+    public MonsterIcon(Entity entity, IconsBuilderSettings settings, Dictionary<string, Vector2i> modIcons, MapIconsSettings mapSettings)
         : base(entity)
     {
-        Update(entity, settings, modIcons);
+        Update(entity, settings, modIcons, mapSettings);
     }
 
-    public void Update(Entity entity, IconsBuilderSettings settings, Dictionary<string, Vector2i> modIcons)
+    public void Update(Entity entity, IconsBuilderSettings settings, Dictionary<string, Vector2i> modIcons, MapIconsSettings mapSettings)
     {
         Show = () => entity.IsAlive;
         if(entity.IsHidden && settings.HideBurriedMonsters)
@@ -43,10 +44,11 @@ public class MonsterIcon : BaseIcon
             MainTexture.Size *= 2;
         }
 
-        if (_HasIngameIcon && 
-            entity.TryGetComponent<MinimapIcon>(out var mI) && 
+        if (_HasIngameIcon &&
+            entity.TryGetComponent<MinimapIcon>(out var mI) &&
             mI.Name != "NPC" &&
-            !isMonsterWithIcon)
+            !isMonsterWithIcon &&
+            !mapSettings.MonstersIgnoreMinimapIconComponent)
             return;
         if (!entity.IsHostile)
         {
@@ -73,9 +75,7 @@ public class MonsterIcon : BaseIcon
             }
 
             if (settings.HighlightEldritchMonsters &&
-                (entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/BlackStarMonsters/", StringComparison.Ordinal) ||
-                 entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/CleansingMonsters/", StringComparison.Ordinal)||
-                 entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/DoomMonsters/", StringComparison.Ordinal)))
+                entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/", StringComparison.Ordinal))
             {
                 BorderColor = settings.EldritchMonstersColor.Value.ToSystem();
             }

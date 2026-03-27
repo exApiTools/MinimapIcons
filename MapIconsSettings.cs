@@ -1,4 +1,4 @@
-﻿using ExileCore.Shared.Attributes;
+using ExileCore.Shared.Attributes;
 using ExileCore.Shared.Interfaces;
 using ExileCore.Shared.Nodes;
 using MinimapIcons.IconsBuilder;
@@ -20,6 +20,11 @@ public class MapIconsSettings : ISettings
     public ToggleNode Enable { get; set; } = new ToggleNode(true);
     public RangeNode<int> IconListRefreshPeriod { get; set; } = new RangeNode<int>(100, 0, 1000);
     public ToggleNode HighlightHiddenMonsters { get; set; } = new ToggleNode(true);
+
+    [Menu(
+        "Monsters: ignore game MinimapIcon",
+        "When enabled, monsters always use plugin minimap styling (rarity circles, etc.) even if the entity has a MinimapIcon component. Skips the in-game-icon replacer route and still draws on the large map while the game shows its own icon.")]
+    public ToggleNode MonstersIgnoreMinimapIconComponent { get; set; } = new ToggleNode(false);
 
     [Menu(null, CollapsedByDefault = true)]
     public ContentNode<TextNode> AlwaysShownIngameIcons { get; set; } =
