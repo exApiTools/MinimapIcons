@@ -85,7 +85,7 @@ public class IconsBuilder
 
     public bool Initialise()
     {
-        Settings.ResetIcons.OnPressed = () => { IconVersion++; };
+        Settings.ReloadIcons.OnPressed = () => { IconVersion++; };
         ReadAlertFile();           
         ReadIgnoreFile();
         return true;

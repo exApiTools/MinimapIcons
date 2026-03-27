@@ -78,7 +78,7 @@ public class IconsBuilderSettings
     public RangeNode<int> SizeShrineIcon { get; set; } = new RangeNode<int>(10, 1, 50);
 
     [JsonIgnore]
-    public ButtonNode ResetIcons { get; set; } = new();
+    public ButtonNode ReloadIcons { get; set; } = new();
 
     [Menu(null, CollapsedByDefault = true)]
     public ContentNode<TextNode> MonstersWithIcons { get; set; } =
