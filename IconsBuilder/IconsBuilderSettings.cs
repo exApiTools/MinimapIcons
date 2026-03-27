@@ -113,6 +113,9 @@ public class MonsterNameSettings
     public ToggleNode ShowMagicNames { get; set; } = new ToggleNode(false);
     public ToggleNode ShowRareNames { get; set; } = new ToggleNode(false);
     public ToggleNode ShowUniqueNames { get; set; } = new ToggleNode(true);
+    public ToggleNode NameBackground { get; set; } = new ToggleNode(true);
+    public ColorNode TextColor { get; set; } = new ColorNode(Color.White);
+    public ColorNode BackgroundColor { get; set; } = new ColorNode(new Color(0, 0, 0, 150));
 }
 
 [Submenu]

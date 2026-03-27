@@ -91,29 +91,45 @@ public class MonsterIcon : BaseIcon
                 switch (Rarity)
                 {
                     case MonsterRarity.White:
-                        if (!isMonsterWithIcon)
-                            MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeRedCircle);
+                        if (!isMonsterWithIcon) MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeRedCircle);
                         if (settings.MonsterRarityNames.ShowNormalNames)
+                        {
                             Text = RenderName.Split(',').FirstOrDefault();
+                            TextColor = settings.MonsterRarityNames.TextColor.Value.ToSystem();
+                            if (settings.MonsterRarityNames.NameBackground) BackgroundColor = settings.MonsterRarityNames.BackgroundColor.Value.ToSystem();
+                        }
+
                         break;
                     case MonsterRarity.Magic:
-                        if (!isMonsterWithIcon)
-                            MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeBlueCircle);
+                        if (!isMonsterWithIcon) MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeBlueCircle);
                         if (settings.MonsterRarityNames.ShowMagicNames)
+                        {
                             Text = RenderName.Split(',').FirstOrDefault();
+                            TextColor = settings.MonsterRarityNames.TextColor.Value.ToSystem();
+                            if (settings.MonsterRarityNames.NameBackground) BackgroundColor = settings.MonsterRarityNames.BackgroundColor.Value.ToSystem();
+                        }
+
                         break;
                     case MonsterRarity.Rare:
-                        if (!isMonsterWithIcon)
-                            MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeYellowCircle);
+                        if (!isMonsterWithIcon) MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeYellowCircle);
                         if (settings.MonsterRarityNames.ShowRareNames)
+                        {
                             Text = RenderName.Split(',').FirstOrDefault();
+                            TextColor = settings.MonsterRarityNames.TextColor.Value.ToSystem();
+                            if (settings.MonsterRarityNames.NameBackground) BackgroundColor = settings.MonsterRarityNames.BackgroundColor.Value.ToSystem();
+                        }
+
                         break;
                     case MonsterRarity.Unique:
-                        if (!isMonsterWithIcon)
-                            MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeWhiteHexagon);
+                        if (!isMonsterWithIcon) MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeWhiteHexagon);
                         MainTexture.Color = Color.DarkOrange;
                         if (settings.MonsterRarityNames.ShowUniqueNames)
+                        {
                             Text = RenderName.Split(',').FirstOrDefault();
+                            TextColor = settings.MonsterRarityNames.TextColor.Value.ToSystem();
+                            if (settings.MonsterRarityNames.NameBackground) BackgroundColor = settings.MonsterRarityNames.BackgroundColor.Value.ToSystem();
+                        }
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(

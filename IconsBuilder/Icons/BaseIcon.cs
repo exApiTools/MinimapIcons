@@ -116,9 +116,11 @@ public abstract class BaseIcon
     public Func<bool> Show { get; set; }
     public Func<bool> Hidden { get; protected set; } = () => false;
     public HudTexture MainTexture { get; protected set; }
-    public System.Drawing.Color? BorderColor { get; protected set; } = null;
+    public Color? BorderColor { get; protected set; } = null;
     public IconPriority Priority { get; protected set; }
     public MonsterRarity Rarity { get; protected set; }
     public string Text { get; protected set; }
+    public Color? TextColor { get; protected set; } = null;
+    public Color? BackgroundColor { get; protected set; } = null;
     public string RenderName => Entity.RenderName;
 }

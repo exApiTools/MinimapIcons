@@ -306,7 +306,18 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
             }
 
             if (!string.IsNullOrEmpty(icon.Text))
-                Graphics.DrawText(icon.Text, position.Translate(0, Settings.ZForText), FontAlign.Center);
+            {
+                var textPos = position.Translate(0, Settings.ZForText);
+                if (icon.BackgroundColor is { } bg)
+                {
+                    var textColor = icon.TextColor?.ToSharpDx() ?? Color.White;
+                    Graphics.DrawTextWithBackground(icon.Text, textPos, textColor, FontAlign.Center, bg.ToSharpDx());
+                }
+                else if (icon.TextColor is { } tc)
+                    Graphics.DrawText(icon.Text, textPos, tc.ToSharpDx(), FontAlign.Center);
+                else
+                    Graphics.DrawText(icon.Text, textPos, FontAlign.Center);
+            }
         }
     }
 
