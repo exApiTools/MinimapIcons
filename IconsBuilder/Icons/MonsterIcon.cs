@@ -7,18 +7,19 @@ using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Enums;
 using ExileCore.Shared.Helpers;
 using GameOffsets.Native;
+using MinimapIcons;
 
 namespace MinimapIcons.IconsBuilder.Icons;
 
 public class MonsterIcon : BaseIcon
 {
-    public MonsterIcon(Entity entity, IconsBuilderSettings settings, Dictionary<string, Vector2i> modIcons)
+    public MonsterIcon(Entity entity, IconsBuilderSettings settings, Dictionary<string, Vector2i> modIcons, MapIconsSettings mapSettings)
         : base(entity)
     {
-        Update(entity, settings, modIcons);
+        Update(entity, settings, modIcons, mapSettings);
     }
 
-    public void Update(Entity entity, IconsBuilderSettings settings, Dictionary<string, Vector2i> modIcons)
+    public void Update(Entity entity, IconsBuilderSettings settings, Dictionary<string, Vector2i> modIcons, MapIconsSettings mapSettings)
     {
         Show = () => entity.IsAlive;
         if(entity.IsHidden && settings.HideBurriedMonsters)
@@ -43,10 +44,11 @@ public class MonsterIcon : BaseIcon
             MainTexture.Size *= 2;
         }
 
-        if (_HasIngameIcon && 
-            entity.TryGetComponent<MinimapIcon>(out var mI) && 
+        if (_HasIngameIcon &&
+            entity.TryGetComponent<MinimapIcon>(out var mI) &&
             mI.Name != "NPC" &&
-            !isMonsterWithIcon)
+            !isMonsterWithIcon &&
+            !mapSettings.MonstersIgnoreMinimapIconComponent)
             return;
         if (!entity.IsHostile)
         {
@@ -73,9 +75,7 @@ public class MonsterIcon : BaseIcon
             }
 
             if (settings.HighlightEldritchMonsters &&
-                (entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/BlackStarMonsters/", StringComparison.Ordinal) ||
-                 entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/CleansingMonsters/", StringComparison.Ordinal)||
-                 entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/DoomMonsters/", StringComparison.Ordinal)))
+                entity.Path.StartsWith("Metadata/Monsters/AtlasInvaders/", StringComparison.Ordinal))
             {
                 BorderColor = settings.EldritchMonstersColor.Value.ToSystem();
             }
@@ -91,29 +91,45 @@ public class MonsterIcon : BaseIcon
                 switch (Rarity)
                 {
                     case MonsterRarity.White:
-                        if (!isMonsterWithIcon)
-                            MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeRedCircle);
+                        if (!isMonsterWithIcon) MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeRedCircle);
                         if (settings.MonsterRarityNames.ShowNormalNames)
+                        {
                             Text = RenderName.Split(',').FirstOrDefault();
+                            TextColor = settings.MonsterRarityNames.TextColor.Value.ToSystem();
+                            if (settings.MonsterRarityNames.NameBackground) BackgroundColor = settings.MonsterRarityNames.BackgroundColor.Value.ToSystem();
+                        }
+
                         break;
                     case MonsterRarity.Magic:
-                        if (!isMonsterWithIcon)
-                            MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeBlueCircle);
+                        if (!isMonsterWithIcon) MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeBlueCircle);
                         if (settings.MonsterRarityNames.ShowMagicNames)
+                        {
                             Text = RenderName.Split(',').FirstOrDefault();
+                            TextColor = settings.MonsterRarityNames.TextColor.Value.ToSystem();
+                            if (settings.MonsterRarityNames.NameBackground) BackgroundColor = settings.MonsterRarityNames.BackgroundColor.Value.ToSystem();
+                        }
+
                         break;
                     case MonsterRarity.Rare:
-                        if (!isMonsterWithIcon)
-                            MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeYellowCircle);
+                        if (!isMonsterWithIcon) MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeYellowCircle);
                         if (settings.MonsterRarityNames.ShowRareNames)
+                        {
                             Text = RenderName.Split(',').FirstOrDefault();
+                            TextColor = settings.MonsterRarityNames.TextColor.Value.ToSystem();
+                            if (settings.MonsterRarityNames.NameBackground) BackgroundColor = settings.MonsterRarityNames.BackgroundColor.Value.ToSystem();
+                        }
+
                         break;
                     case MonsterRarity.Unique:
-                        if (!isMonsterWithIcon)
-                            MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeWhiteHexagon);
+                        if (!isMonsterWithIcon) MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeWhiteHexagon);
                         MainTexture.Color = Color.DarkOrange;
                         if (settings.MonsterRarityNames.ShowUniqueNames)
+                        {
                             Text = RenderName.Split(',').FirstOrDefault();
+                            TextColor = settings.MonsterRarityNames.TextColor.Value.ToSystem();
+                            if (settings.MonsterRarityNames.NameBackground) BackgroundColor = settings.MonsterRarityNames.BackgroundColor.Value.ToSystem();
+                        }
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(

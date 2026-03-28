@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Linq;
 using ExileCore;
 using ExileCore.PoEMemory.Components;
-using ExileCore.PoEMemory.Elements;
 using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Cache;
 using ExileCore.Shared.Enums;
@@ -159,9 +158,6 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
 
     private IngameUIElements _ingameUi;
     private bool? _largeMap;
-    private float _mapScale;
-    private Vector2 _mapCenter;
-    private SubMap LargeMapWindow => GameController.Game.IngameState.IngameUi.Map.LargeMap;
     private CachedValue<List<BaseIcon>> _iconListCache;
     private IconsBuilder.IconsBuilder _iconsBuilder;
     private IconsBuilder.IconsBuilder IconsBuilder => _iconsBuilder ??= new IconsBuilder.IconsBuilder(this);
@@ -207,17 +203,11 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
         var smallMiniMap = _ingameUi.Map.SmallMiniMap;
         if (smallMiniMap.IsValid && smallMiniMap.IsVisibleLocal)
         {
-            var mapRect = smallMiniMap.GetClientRectCache;
-            _mapCenter = mapRect.Center.ToVector2Num();
             _largeMap = false;
-            _mapScale = smallMiniMap.MapScale;
         }
         else if (_ingameUi.Map.LargeMap.IsVisibleLocal)
         {
-            var largeMapWindow = LargeMapWindow;
-            _mapCenter = largeMapWindow.MapCenter;
             _largeMap = true;
-            _mapScale = largeMapWindow.MapScale;
         }
         else
         {
@@ -229,93 +219,71 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
 
     public override void Render()
     {
-        if (_largeMap == null || 
-            !GameController.InGame ||
-            Settings.DrawOnlyOnLargeMap && _largeMap != true) 
-            return;
+        if (_largeMap == null || !GameController.InGame || Settings.DrawOnlyOnLargeMap && _largeMap != true) return;
 
-        if (!Settings.IgnoreFullscreenPanels &&
-            _ingameUi.FullscreenPanels.Any(x => x.IsVisible) ||
-            !Settings.IgnoreLargePanels &&
-            _ingameUi.LargePanels.Any(x => x.IsVisible))
-            return;
-
-        var playerRender = GameController?.Player?.GetComponent<Render>();
-        if (playerRender == null) return;
-        var playerPos = playerRender.PosNum.WorldToGrid();
-        var playerHeight = -playerRender.UnclampedHeight;
-
-        if (LargeMapWindow == null) return;
+        if (!Settings.IgnoreFullscreenPanels && _ingameUi.FullscreenPanels.Any(x => x.IsVisible) || !Settings.IgnoreLargePanels && _ingameUi.LargePanels.Any(x => x.IsVisible)) return;
 
         var baseIcons = _iconListCache.Value;
         if (baseIcons == null) return;
 
-        foreach (var icon in baseIcons)
+        using (Graphics.MapSurfaceClip())
         {
-            if (icon?.Entity == null) continue;
-
-            if (!Settings.DrawMonsters && icon.Entity.Type == EntityType.Monster)
-                continue;
-
-            if (IgnoreCache.GetOrAdd(icon.Entity.Path, () => Ignored.Any(x => icon.Entity.Path.StartsWith(x))))
-                continue;
-
-            if (icon.Entity.Path.StartsWith(
-                    "Metadata/Monsters/AtlasExiles/BasiliskInfluenceMonsters/BasiliskBurrowingViper", StringComparison.Ordinal)
-                && icon.Entity.Rarity != MonsterRarity.Unique)
-                continue;
-
-            if (!icon.Show())
-                continue;
-
-            if (icon.HasIngameIcon &&
-                icon is not CustomIcon &&
-                (!Settings.DrawReplacementsForGameIconsWhenOutOfRange || icon.Entity.IsValid) &&
-                !Settings.AlwaysShownIngameIcons.Content.Any(x => global::MinimapIcons.IconsBuilder.IconsBuilder.GetRegex(x.Value).IsMatch(icon.Entity.Path)))
-                continue;
-
-            var iconGridPos = icon.GridPosition();
-            var position = _mapCenter +
-                           DeltaInWorldToMinimapDelta(iconGridPos - playerPos,
-                               (playerHeight + GameController.IngameState.Data.GetTerrainHeightAt(iconGridPos)) * PoeMapExtension.WorldToGridConversion);
-
-            var iconValueMainTexture = icon.MainTexture;
-            var size = iconValueMainTexture.Size;
-            var halfSize = size / 2f;
-            icon.DrawRect = new RectangleF(position.X - halfSize, position.Y - halfSize, size, size);
-            var drawRect = icon.DrawRect;
-            if (_largeMap == false && !_ingameUi.Map.SmallMiniMap.GetClientRectCache.Contains(drawRect)) 
-                continue;
-
-            Graphics.DrawImage(iconValueMainTexture.FileName, drawRect, iconValueMainTexture.UV, iconValueMainTexture.Color.ToSharpDx());
-            if (icon.BorderColor is { } borderColor)
+            foreach (var icon in baseIcons)
             {
-                Graphics.DrawFrame(drawRect, borderColor.ToSharpDx(), 1);
+                if (icon?.Entity == null) continue;
+
+                if (!Settings.DrawMonsters && icon.Entity.Type == EntityType.Monster) continue;
+
+                if (IgnoreCache.GetOrAdd(icon.Entity.Path, () => Ignored.Any(x => icon.Entity.Path.StartsWith(x)))) continue;
+
+                if (icon.Entity.Path.StartsWith("Metadata/Monsters/AtlasExiles/BasiliskInfluenceMonsters/BasiliskBurrowingViper", StringComparison.Ordinal) &&
+                    icon.Entity.Rarity != MonsterRarity.Unique) continue;
+
+                if (!icon.Show()) continue;
+
+                if (icon.HasIngameIcon &&
+                    icon is not CustomIcon &&
+                    (!Settings.DrawReplacementsForGameIconsWhenOutOfRange || icon.Entity.IsValid) &&
+                    !Settings.AlwaysShownIngameIcons.Content.Any(x => global::MinimapIcons.IconsBuilder.IconsBuilder.GetRegex(x.Value).IsMatch(icon.Entity.Path)) &&
+                    !(icon.Entity.Type == EntityType.Monster && Settings.MonstersIgnoreMinimapIconComponent)) continue;
+
+                var iconValueMainTexture = icon.MainTexture;
+                var size = iconValueMainTexture.Size;
+                var halfSize = size / 2f;
+                var mapScreenPos = Graphics.GridToMap(icon.Entity.PosNum);
+
+                icon.DrawRect = new RectangleF(mapScreenPos.X - halfSize, mapScreenPos.Y - halfSize, size, size);
+                var drawRect = icon.DrawRect;
+
+                Graphics.DrawImageMap(iconValueMainTexture.FileName, iconValueMainTexture.UV, iconValueMainTexture.Color.ToSharpDx(), icon.Entity.PosNum, size);
+                if (icon.BorderColor is { } borderColor)
+                    Graphics.DrawFrame(drawRect, borderColor.ToSharpDx(), 1);
+
+                if (Settings.HighlightHiddenMonsters && icon.Hidden())
+                {
+                    var inset = size * 0.1f;
+                    Graphics.DrawImageMap("Icons.png", SpriteHelper.GetUV(MapIconsIndex.LootFilterSmallWhiteCircle), Color.White, icon.Entity.PosNum, size - 2f * inset);
+                }
+
+                if (!string.IsNullOrEmpty(icon.Text))
+                {
+                    var textPos = mapScreenPos.Translate(0, Settings.ZForText);
+                    if (icon.BackgroundColor is { } bg)
+                    {
+                        var textColor = icon.TextColor?.ToSharpDx() ?? Color.White;
+                        Graphics.DrawTextWithBackground(icon.Text, textPos, textColor, FontAlign.Center, bg.ToSharpDx());
+                    }
+                    else if (icon.TextColor is { } tc)
+                    {
+                        Graphics.DrawText(icon.Text, textPos, tc.ToSharpDx(), FontAlign.Center);
+                    }
+                    else
+                    {
+                        Graphics.DrawText(icon.Text, textPos, FontAlign.Center);
+                    }
+                }
             }
-
-            if (Settings.HighlightHiddenMonsters && icon.Hidden())
-            {
-                var s = drawRect.Width * 0.1f;
-                drawRect.Inflate(-s, -s);
-
-                Graphics.DrawImage("Icons.png", drawRect,
-                    SpriteHelper.GetUV(MapIconsIndex.LootFilterSmallWhiteCircle), Color.White);
-
-                drawRect.Inflate(s, s);
-            }
-
-            if (!string.IsNullOrEmpty(icon.Text))
-                Graphics.DrawText(icon.Text, position.Translate(0, Settings.ZForText), FontAlign.Center);
         }
-    }
-
-    private const float CameraAngle = 38.7f * MathF.PI / 180;
-    private static readonly float CameraAngleCos = MathF.Cos(CameraAngle);
-    private static readonly float CameraAngleSin = MathF.Sin(CameraAngle);
-
-    private Vector2 DeltaInWorldToMinimapDelta(Vector2 delta, float deltaZ)
-    {
-        return _mapScale * Vector2.Multiply(new Vector2(delta.X - delta.Y, deltaZ - (delta.X + delta.Y)), new Vector2(CameraAngleCos, CameraAngleSin));
     }
 }
 
