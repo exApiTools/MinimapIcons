@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using ExileCore;
 using ExileCore.PoEMemory.Components;
 using ExileCore.PoEMemory.Elements;
@@ -10,6 +6,11 @@ using ExileCore.Shared.Cache;
 using ExileCore.Shared.Enums;
 using ExileCore.Shared.Helpers;
 using MinimapIcons.IconsBuilder.Icons;
+using MinimapIcons.IgnoreRules;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using Color = SharpDX.Color;
 using RectangleF = SharpDX.RectangleF;
 using Vector2 = System.Numerics.Vector2;
@@ -157,6 +158,7 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
 
     private readonly Dictionary<string, bool> IgnoreCache = new Dictionary<string, bool>();
 
+    private IgnoreRulesManager _ignoreRulesManager;
     private IngameUIElements _ingameUi;
     private bool? _largeMap;
     private float _mapScale;
@@ -168,6 +170,7 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
 
     public override bool Initialise()
     {
+        _ignoreRulesManager = new IgnoreRulesManager(DirectoryFullName);
         IconsBuilder.Initialise();
         Settings.AlwaysShownIngameIcons.Content = Settings.AlwaysShownIngameIcons.Content.DistinctBy(x => x.Value).ToList();
         Graphics.InitImage("sprites.png");
@@ -175,6 +178,48 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
         CanUseMultiThreading = true;
         _iconListCache = CreateIconListCache();
         Settings.IconListRefreshPeriod.OnValueChanged += (_, _) => _iconListCache = CreateIconListCache();
+
+        // Setup custom ignore rules UI handlers
+        Settings.CustomIgnoreSettings.ReloadRules.OnPressed += () =>
+        {
+            _ignoreRulesManager.LoadCustomRules();
+            DebugWindow.LogMsg("Custom ignore rules reloaded");
+        };
+
+        Settings.CustomIgnoreSettings.OpenConfigFolder.OnPressed += () =>
+        {
+            var configPath = System.IO.Path.Combine(DirectoryFullName, "config");
+            Process.Start("explorer.exe", configPath);
+        };
+
+        Settings.CustomIgnoreSettings.AddRule.OnPressed += () =>
+        {
+            var pattern = Settings.CustomIgnoreSettings.NewRulePattern.Value;
+            if (string.IsNullOrWhiteSpace(pattern))
+            {
+                DebugWindow.LogMsg("Please enter a pattern for the rule");
+                return;
+            }
+
+            var ruleType = Settings.CustomIgnoreSettings.NewRuleType.Value switch
+            {
+                "Metadata Exact" => IgnoreRuleType.MetadataExact,
+                "Metadata Starts With" => IgnoreRuleType.MetadataStartsWith,
+                "Metadata Contains" => IgnoreRuleType.MetadataContains,
+                "Name Exact" => IgnoreRuleType.NameExact,
+                "Name Contains" => IgnoreRuleType.NameContains,
+                _ => IgnoreRuleType.MetadataStartsWith
+            };
+
+            var newRule = new IgnoreRule(ruleType, pattern);
+            _ignoreRulesManager.AddRule(newRule);
+
+            DebugWindow.LogMsg($"Added ignore rule: {newRule}");
+
+            // Clear the pattern field after adding
+            Settings.CustomIgnoreSettings.NewRulePattern.Value = "";
+        };
+
         return true;
     }
 
@@ -229,9 +274,9 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
 
     public override void Render()
     {
-        if (_largeMap == null || 
+        if (_largeMap == null ||
             !GameController.InGame ||
-            Settings.DrawOnlyOnLargeMap && _largeMap != true) 
+            Settings.DrawOnlyOnLargeMap && _largeMap != true)
             return;
 
         if (!Settings.IgnoreFullscreenPanels &&
@@ -257,8 +302,18 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
             if (!Settings.DrawMonsters && icon.Entity.Type == EntityType.Monster)
                 continue;
 
+
+            // Use custom ignore rules if enabled
+            if (Settings.CustomIgnoreSettings.EnableCustomIgnoreRules)
+            {
+                if (_ignoreRulesManager.ShouldIgnore(icon.Entity.Path, icon.Entity.RenderName))
+                    continue;
+            }
+
+            // hardcoded ignore list
             if (IgnoreCache.GetOrAdd(icon.Entity.Path, () => Ignored.Any(x => icon.Entity.Path.StartsWith(x))))
                 continue;
+
 
             if (icon.Entity.Path.StartsWith(
                     "Metadata/Monsters/AtlasExiles/BasiliskInfluenceMonsters/BasiliskBurrowingViper", StringComparison.Ordinal)
@@ -284,7 +339,7 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
             var halfSize = size / 2f;
             icon.DrawRect = new RectangleF(position.X - halfSize, position.Y - halfSize, size, size);
             var drawRect = icon.DrawRect;
-            if (_largeMap == false && !_ingameUi.Map.SmallMiniMap.GetClientRectCache.Contains(drawRect)) 
+            if (_largeMap == false && !_ingameUi.Map.SmallMiniMap.GetClientRectCache.Contains(drawRect))
                 continue;
 
             Graphics.DrawImage(iconValueMainTexture.FileName, drawRect, iconValueMainTexture.UV, iconValueMainTexture.Color.ToSharpDx());

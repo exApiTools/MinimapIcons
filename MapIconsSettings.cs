@@ -2,6 +2,7 @@
 using ExileCore.Shared.Interfaces;
 using ExileCore.Shared.Nodes;
 using MinimapIcons.IconsBuilder;
+using MinimapIcons.IgnoreRules;
 
 namespace MinimapIcons;
 
@@ -41,10 +42,13 @@ public class MapIconsSettings : ISettings
             Content =
             [
             ],
-            EnableControls = true, 
+            EnableControls = true,
             ItemFactory = () => new TextNode(""),
             UseFlatItems = true,
         };
+
+    [Menu("Custom Ignore Rules", CollapsedByDefault = true)]
+    public CustomIgnoreSettings CustomIgnoreSettings { get; set; } = new();
 
     public IconsBuilderSettings IconsBuilderSettings { get; set; } = new();
 }

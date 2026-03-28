@@ -1,0 +1,25 @@
+# Custom Ignore Rules for MinimapIcons
+# 
+# Rule formats:
+# META=Metadata/Monsters/Exact/Path              - Exact metadata match
+# META^Metadata/Monsters/Prefix                  - Metadata starts with
+# META*PartialMetadata                           - Metadata contains
+# NAME=Exact Entity Name                         - Exact name match
+# NAME*Partial Name                              - Name contains
+#
+# Lines starting with # are comments
+# Prefix with ! to disable a rule without deleting it
+#
+# Examples:
+# META*DoodadDaemon                               - Ignore all containing "DoodadDaemon" in metadata
+# META^Metadata/Monsters/AtlasExiles/             - Ignore all starting with this path
+# NAME*Volatile Core                              - Ignore by name containing "Volatile Core"
+# !META^Metadata/Monsters/Disabled                - Disabled rule (not applied)
+#
+# How to add entity to ignore:
+# 1. Open plugin settings -> Custom Ignore Rules
+# 2. Select rule type in "New Rule Type"
+# 3. Enter pattern in "New Rule Pattern"
+# 4. Click "Add Rule"
+#
+# Your rules below:
