@@ -28,6 +28,7 @@ public enum ChestType
     Heist,
     Expedition,
     Sanctum,
+    Deepwater,
 }
 
 public class ChestIcon : BaseIcon
@@ -89,6 +90,8 @@ public ChestIcon(Entity entity, IconsBuilderSettings settings) : base(entity)
             CType = ChestType.Abyss;
         else if (Entity.Path.Contains("Metadata/Chests/Incursion"))
             CType = ChestType.Incursion;
+        else if (Entity.Path.StartsWith("Metadata/Chests/LeagueDeepwater/", StringComparison.Ordinal))
+            CType = ChestType.Deepwater;
         else if (Entity.Path.Contains("Fossil"))
             CType = ChestType.Fossil;
         else if (Entity.Path.Contains("Metadata/Chests/Delve"))
@@ -134,6 +137,12 @@ public ChestIcon(Entity entity, IconsBuilderSettings settings) : base(entity)
 
         switch (CType)
         {
+            case ChestType.Deepwater:
+                MainTexture.Size = settings.SizeDeepwaterChestIcon;
+                MainTexture.FileName = "Icons.png";
+                MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.HeistPathChest);
+                MainTexture.Color = Color.DarkGreen;
+                break;
             case ChestType.Breach:
                 MainTexture.Size = settings.SizeBreachChestIcon;
 

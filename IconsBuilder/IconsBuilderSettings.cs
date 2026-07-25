@@ -54,6 +54,9 @@ public class IconsBuilderSettings
     [Menu("Breach chest icon size")]
     public RangeNode<int> SizeBreachChestIcon { get; set; } = new RangeNode<int>(10, 1, 50);
 
+    [Menu("Deepwater chest icon size")]
+    public RangeNode<int> SizeDeepwaterChestIcon { get; set; } = new RangeNode<int>(20, 1, 50);
+
     [Menu("Heist chest icon size")]
     public RangeNode<int> SizeHeistChestIcon { get; set; } = new RangeNode<int>(30, 1, 50);
 
