@@ -22,6 +22,7 @@ public class IconsBuilderSettings
     public ToggleNode HideMinions { get; set; } = new ToggleNode(false);
     public ToggleNode DeliriumText { get; set; } = new ToggleNode(false);
     public ToggleNode HideBurriedMonsters { get; set; } = new ToggleNode(false);
+    public ToggleNode HideBuriedBreachMonsters { get; set; } = new ToggleNode(false);
     public MonsterNameSettings MonsterRarityNames { get; set; } = new MonsterNameSettings();
     public ToggleNode UseReplacementsForGameIconsWhenOutOfRange { get; set; } = new ToggleNode(true);
     public ToggleNode UseReplacementsForItemIconsWhenOutOfRange { get; set; } = new ToggleNode(true);

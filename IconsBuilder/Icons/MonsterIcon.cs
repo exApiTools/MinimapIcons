@@ -21,7 +21,8 @@ public class MonsterIcon : BaseIcon
     public void Update(Entity entity, IconsBuilderSettings settings, Dictionary<string, Vector2i> modIcons)
     {
         Show = () => entity.IsAlive;
-        if(entity.IsHidden && settings.HideBurriedMonsters)
+        if (entity.IsHidden && settings.HideBurriedMonsters ||
+            entity.IsHidden && settings.HideBuriedBreachMonsters && entity.Path.StartsWith("Metadata/Monsters/Breach/", StringComparison.Ordinal))
         {
             Show = () => !entity.IsHidden && entity.IsAlive;
         }
