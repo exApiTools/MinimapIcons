@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using ExileCore;
 using ExileCore.PoEMemory.Components;
 using ExileCore.PoEMemory.Elements;
@@ -9,7 +5,12 @@ using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Cache;
 using ExileCore.Shared.Enums;
 using ExileCore.Shared.Helpers;
+using ExileCore.Shared.Interfaces;
 using MinimapIcons.IconsBuilder.Icons;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using Color = SharpDX.Color;
 using RectangleF = SharpDX.RectangleF;
 using Vector2 = System.Numerics.Vector2;
@@ -187,9 +188,15 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
     {
         return new TimeCache<List<BaseIcon>>(() =>
         {
-            var entitySource = Settings.DrawCachedEntities
+            IEnumerable<Entity> entitySource = Settings.DrawCachedEntities
                 ? GameController?.EntityListWrapper.Entities
                 : GameController?.EntityListWrapper?.OnlyValidEntities;
+            if (Settings.IconsBuilderSettings.ShowSleepingEntities &&
+                GameController?.SleepingEntityListWrapper?.Entities is { Count: > 0 } sleepingEntities)
+            {
+                entitySource = (entitySource ?? []).Concat(sleepingEntities);
+            }
+
             var baseIcons = entitySource?.Select(x => x.GetHudComponent<BaseIcon>())
                 .Where(icon => icon != null)
                 .Where(icon => (!icon.Entity.Path.Contains("Breach/Monsters") && !icon.Entity.Path.Contains("Chests/breach")) || Settings.CacheBreachEntities || icon.Entity.IsValid)

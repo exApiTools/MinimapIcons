@@ -84,6 +84,11 @@ public class IconsBuilderSettings
     public ToggleNode ShowNormalMonsters { get; set; } = new ToggleNode(true);
     public ToggleNode ShowMagicMonsters { get; set; } = new ToggleNode(true);
 
+    [ConditionalDisplay(nameof(DisplayShowSleepingEntities))]
+    public ToggleNode ShowSleepingEntities { get; set; } = new ToggleNode(false);
+
+    public bool DisplayShowSleepingEntities => Core.Current?.GameController?.Settings?.CoreSettings?.DebugSettings?.CollectSleepingEntities?.Value == true;
+
     [JsonIgnore]
     public ButtonNode ResetIcons { get; set; } = new();
 

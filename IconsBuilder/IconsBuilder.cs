@@ -101,7 +101,14 @@ public class IconsBuilder
 
     private void AddIcons()
     {
-        foreach (var entity in _plugin.GameController.Entities)
+        IEnumerable<Entity> source = _plugin.GameController.Entities;
+        if (Settings.ShowSleepingEntities &&
+            _plugin.GameController.SleepingEntityListWrapper?.Entities is { Count: > 0 } sleepingEntities)
+        {
+            source = source.Concat(sleepingEntities);
+        }
+
+        foreach (var entity in source)
         {
             try
             {
