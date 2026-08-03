@@ -19,7 +19,10 @@ public class CustomIcon : BaseIcon
 
         if (customIconSettings.DisableDrawingHiddenIcon)
             Hidden = () => false;
-            
+
+        Text = customIconSettings.DisplayString;
+        TextColor = customIconSettings.TextColor.Value.ToSystem();
+
         MainTexture = new HudTexture("Icons.png")
         {
             UV = SpriteHelper.GetUV(customIconSettings.Icon),

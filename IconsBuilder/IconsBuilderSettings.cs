@@ -132,6 +132,9 @@ public class CustomIconSettings
     public ToggleNode OnlyShowNotOpened { get; set; } = new(false);
     public ToggleNode OnlyShowNonHiddenIcons { get; set; } = new(false);
     public ToggleNode DisableDrawingHiddenIcon { get; set; } = new(false);
+    public TextNode DisplayString { get; set; } = new("");
+    public ColorNode TextColor { get; set; } = new(Color.White);
+
     [JsonConverter(typeof(StringEnumConverter))]
     public MapIconsIndex Icon;
 

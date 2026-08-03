@@ -305,7 +305,7 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
             }
 
             if (!string.IsNullOrEmpty(icon.Text))
-                Graphics.DrawText(icon.Text, position.Translate(0, Settings.ZForText), FontAlign.Center);
+                Graphics.DrawText(icon.Text, position.Translate(0, Settings.ZForText), icon.TextColor?.ToSharpDx() ?? Color.White, FontAlign.Center);
         }
     }
 

@@ -120,5 +120,6 @@ public abstract class BaseIcon
     public IconPriority Priority { get; protected set; }
     public MonsterRarity Rarity { get; protected set; }
     public string Text { get; protected set; }
+    public System.Drawing.Color? TextColor { get; protected set; }
     public string RenderName => Entity.RenderName;
 }
