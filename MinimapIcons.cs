@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Color = SharpDX.Color;
 using RectangleF = SharpDX.RectangleF;
 using Vector2 = System.Numerics.Vector2;
@@ -158,6 +159,18 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
 
     private readonly Dictionary<string, bool> IgnoreCache = new Dictionary<string, bool>();
 
+    // Compiled regexes for Settings.HiddenIcons keyed by pattern text, plus the per-path answers
+    // derived from them. A breach puts hundreds of icons behind a handful of distinct paths, so
+    // this turns the regex work into a dictionary hit after the first sighting of each path.
+    private readonly Dictionary<string, Regex> _hiddenIconRegexes = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _badHiddenIconPatterns = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, bool> _hiddenIconCache = new(StringComparer.Ordinal);
+
+    // Cheap hash of the rule set, so an edit in the menu invalidates the cache above. Recomputed
+    // once per frame rather than per icon, and an int rather than a joined string, because
+    // Render() runs every frame and should not allocate.
+    private int _hiddenIconSignature;
+
     private IngameUIElements _ingameUi;
     private bool? _largeMap;
     private float _mapScale;
@@ -257,6 +270,8 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
         var baseIcons = _iconListCache.Value;
         if (baseIcons == null) return;
 
+        RefreshHiddenIconRules();
+
         foreach (var icon in baseIcons)
         {
             if (icon?.Entity == null) continue;
@@ -265,6 +280,9 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
                 continue;
 
             if (IgnoreCache.GetOrAdd(icon.Entity.Path, () => Ignored.Any(x => icon.Entity.Path.StartsWith(x))))
+                continue;
+
+            if (IsHiddenByRule(icon.Entity.Path))
                 continue;
 
             if (icon.Entity.Path.StartsWith(
@@ -313,6 +331,76 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
 
             if (!string.IsNullOrEmpty(icon.Text))
                 Graphics.DrawText(icon.Text, position.Translate(0, Settings.ZForText), icon.TextColor?.ToSharpDx() ?? Color.White, FontAlign.Center);
+        }
+    }
+
+    /// <summary>
+    /// Drops the cached per-path answers whenever a rule's toggle or pattern changes, so an edit
+    /// in the menu takes effect on the next frame. Called once per frame, before the icon loop.
+    /// </summary>
+    private void RefreshHiddenIconRules()
+    {
+        var rules = Settings.HiddenIcons?.Content;
+        var signature = 17;
+        if (rules != null)
+        {
+            foreach (var rule in rules)
+            {
+                if (rule == null) continue;
+                signature = signature * 31 + (rule.Hide.Value ? 1 : 0);
+                signature = signature * 31 + (rule.MetadataRegex?.Value?.GetHashCode() ?? 0);
+            }
+        }
+
+        if (signature == _hiddenIconSignature) return;
+        _hiddenIconSignature = signature;
+        _hiddenIconCache.Clear();
+    }
+
+    private bool IsHiddenByRule(string path)
+    {
+        if (string.IsNullOrEmpty(path)) return false;
+        var rules = Settings.HiddenIcons?.Content;
+        if (rules == null || rules.Count == 0) return false;
+        if (_hiddenIconCache.TryGetValue(path, out var cached)) return cached;
+
+        var hidden = false;
+        foreach (var rule in rules)
+        {
+            if (rule == null || !rule.Hide.Value) continue;
+            var pattern = rule.MetadataRegex?.Value;
+            if (string.IsNullOrWhiteSpace(pattern)) continue;
+
+            var regex = GetHiddenIconRegex(pattern);
+            if (regex != null && regex.IsMatch(path))
+            {
+                hidden = true;
+                break;
+            }
+        }
+
+        _hiddenIconCache[path] = hidden;
+        return hidden;
+    }
+
+    private Regex GetHiddenIconRegex(string pattern)
+    {
+        if (_hiddenIconRegexes.TryGetValue(pattern, out var cached)) return cached;
+        // A half-typed pattern is a normal state while editing the field, so a pattern that fails
+        // to compile is reported once and then skipped rather than logged every frame.
+        if (_badHiddenIconPatterns.Contains(pattern)) return null;
+
+        try
+        {
+            var regex = new Regex(pattern, RegexOptions.Compiled);
+            _hiddenIconRegexes[pattern] = regex;
+            return regex;
+        }
+        catch (ArgumentException ex)
+        {
+            _badHiddenIconPatterns.Add(pattern);
+            LogError($"MinimapIcons: invalid hidden icon regex '{pattern}' -- rule skipped. {ex.Message}");
+            return null;
         }
     }
 
