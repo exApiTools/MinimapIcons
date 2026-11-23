@@ -220,7 +220,7 @@ public class IconsBuilder
         {
             //Mission marker
             if (entity.Path.Equals("Metadata/MiscellaneousObjects/MissionMarker", StringComparison.Ordinal) ||
-                entity.GetComponent<MinimapIcon>().Name.Equals("MissionTarget", StringComparison.Ordinal))
+                entity.GetComponent<MinimapIcon>()?.Name == "MissionTarget")
                 return new MissionMarkerIcon(entity, Settings);
 
             return new MiscIcon(entity, Settings);
