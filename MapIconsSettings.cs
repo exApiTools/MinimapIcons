@@ -1,4 +1,6 @@
-﻿using ExileCore.Shared.Attributes;
+﻿using System.Collections.Generic;
+using System.Linq;
+using ExileCore.Shared.Attributes;
 using ExileCore.Shared.Interfaces;
 using ExileCore.Shared.Nodes;
 using MinimapIcons.IconsBuilder;
@@ -45,6 +47,34 @@ public class MapIconsSettings : ISettings
             ItemFactory = () => new TextNode(""),
             UseFlatItems = true,
         };
+
+    /// <summary>
+    /// The "always ignore" patterns the plugin ships with. A saved settings file keeps its own list, so a pattern added
+    /// here later is appended to it once on load; see AlwaysIgnoreDefaultsApplied.
+    /// </summary>
+    public static readonly string[] AlwaysIgnoreDefaults =
+    [
+        // Unique-rarity orbs that come in groups and would otherwise draw as unique monster icons
+        "^Metadata/Monsters/VolatileCore/", // "Rare Monsters have Volatile Cores"
+        "^Metadata/Monsters/LeagueArchnemesis/LivingCrystal",
+    ];
+
+    [Menu(null, CollapsedByDefault = true)]
+    public ContentNode<TextNode> AlwaysIgnoreMinimapIcons { get; set; } =
+        new ContentNode<TextNode>()
+        {
+            Content = AlwaysIgnoreDefaults.Select(pattern => new TextNode(pattern)).ToList(),
+            EnableControls = true,
+            ItemFactory = () => new TextNode(""),
+            UseFlatItems = true,
+        };
+
+    /// <summary>
+    /// The AlwaysIgnoreDefaults already added to AlwaysIgnoreMinimapIcons, so a default the user removed is not added
+    /// back.
+    /// </summary>
+    [IgnoreMenu]
+    public List<string> AlwaysIgnoreDefaultsApplied { get; set; } = [];
 
     public IconsBuilderSettings IconsBuilderSettings { get; set; } = new();
 }

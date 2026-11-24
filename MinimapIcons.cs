@@ -6,6 +6,7 @@ using ExileCore.Shared.Cache;
 using ExileCore.Shared.Enums;
 using ExileCore.Shared.Helpers;
 using ExileCore.Shared.Interfaces;
+using ExileCore.Shared.Nodes;
 using MinimapIcons.IconsBuilder.Icons;
 using System;
 using System.Collections.Generic;
@@ -171,6 +172,7 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
     {
         IconsBuilder.Initialise();
         Settings.AlwaysShownIngameIcons.Content = Settings.AlwaysShownIngameIcons.Content.DistinctBy(x => x.Value).ToList();
+        AddNewAlwaysIgnoreDefaults();
         Graphics.InitImage("sprites.png");
         Graphics.InitImage("Icons.png");
         CanUseMultiThreading = true;
@@ -199,11 +201,69 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
 
             var baseIcons = entitySource?.Select(x => x.GetHudComponent<BaseIcon>())
                 .Where(icon => icon != null)
+                .Where(icon => !IsAlwaysIgnored(icon.Entity))
                 .Where(icon => (!icon.Entity.Path.Contains("Breach/Monsters") && !icon.Entity.Path.Contains("Chests/breach")) || Settings.CacheBreachEntities || icon.Entity.IsValid)
                 .OrderBy(x => x.Priority)
                 .ToList();
             return baseIcons ?? [];
         }, Settings.IconListRefreshPeriod);
+    }
+
+    /// <summary>
+    /// Appends each of MapIconsSettings.AlwaysIgnoreDefaults that the saved "always ignore" list has not been given yet,
+    /// and records it as given. A saved list replaces the default one on load, so without this a default added in a
+    /// later version would only reach fresh installs; recording it means a default the user removed stays removed.
+    /// </summary>
+    private void AddNewAlwaysIgnoreDefaults()
+    {
+        var content = Settings.AlwaysIgnoreMinimapIcons.Content;
+        var applied = Settings.AlwaysIgnoreDefaultsApplied;
+
+        foreach (var pattern in MapIconsSettings.AlwaysIgnoreDefaults)
+        {
+            if (applied.Contains(pattern))
+                continue;
+
+            if (!content.Any(x => x.Value == pattern))
+                content.Add(new TextNode(pattern));
+
+            applied.Add(pattern);
+        }
+    }
+
+    /// <summary>
+    /// Entities whose metadata matches one of the "always ignore" patterns never get an icon.
+    /// Plain text matches anywhere in it, so "^...$" pins it to one exact path. Matched against
+    /// Metadata, not Path: Path carries the monster level on the end ("...@83"), which an anchored
+    /// pattern would never match.
+    /// </summary>
+    public bool IsAlwaysIgnored(Entity entity)
+    {
+        var patterns = Settings.AlwaysIgnoreMinimapIcons.Content;
+        if (patterns.Count == 0 || entity == null)
+            return false;
+
+        var metadata = entity.Metadata;
+        if (string.IsNullOrEmpty(metadata))
+            return false;
+
+        foreach (var pattern in patterns)
+        {
+            if (string.IsNullOrWhiteSpace(pattern?.Value))
+                continue;
+
+            try
+            {
+                if (global::MinimapIcons.IconsBuilder.IconsBuilder.GetRegex(pattern.Value).IsMatch(metadata))
+                    return true;
+            }
+            catch (ArgumentException)
+            {
+                // A pattern half typed into the box is not a match, and must not throw every frame.
+            }
+        }
+
+        return false;
     }
 
     public override Job Tick()
