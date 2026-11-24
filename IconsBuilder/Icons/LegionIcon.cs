@@ -50,8 +50,8 @@ public class LegionIcon : BaseIcon
 
             Show = () =>
             {
-                if (Entity.IsValid)
-                    return Entity.GetComponent<Life>().HPPercentage > 0.02;
+                if (Entity.IsValid && Entity.GetComponent<Life>() is { } life)
+                    return life.HPPercentage > 0.02;
 
                 return Entity.IsAlive;
             };
@@ -89,7 +89,7 @@ public class LegionIcon : BaseIcon
 
             if (statDictionary == null)
             {
-                Show = () => Entity.GetComponent<Life>().HPPercentage > 0.02;
+                Show = () => Entity.GetComponent<Life>()?.HPPercentage > 0.02;
                 return;
             }
 
