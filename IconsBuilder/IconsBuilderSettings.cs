@@ -24,6 +24,22 @@ public class IconsBuilderSettings
     public ToggleNode HideBurriedMonsters { get; set; } = new ToggleNode(false);
     public ToggleNode HideBuriedBreachMonsters { get; set; } = new ToggleNode(false);
     public MonsterNameSettings MonsterRarityNames { get; set; } = new MonsterNameSettings();
+
+    [Menu(null, CollapsedByDefault = true)]
+    public ContentNode<TextNode> AlwaysHiddenMonsterNames { get; set; } =
+        new ContentNode<TextNode>()
+        {
+            Content =
+            [
+                // Unique-rarity orbs that come in groups, so their names can cover the map
+                new TextNode("^Metadata/Monsters/VolatileCore/"), // "Rare Monsters have Volatile Cores"
+                new TextNode("^Metadata/Monsters/LeagueArchnemesis/LivingCrystal"),
+            ],
+            EnableControls = true,
+            ItemFactory = () => new TextNode(""),
+            UseFlatItems = true,
+        };
+
     public ToggleNode UseReplacementsForGameIconsWhenOutOfRange { get; set; } = new ToggleNode(true);
     public ToggleNode UseReplacementsForItemIconsWhenOutOfRange { get; set; } = new ToggleNode(true);
     public ToggleNode HighlightEldritchMonsters { get; set; } = new ToggleNode(true);

@@ -311,9 +311,43 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
                 drawRect.Inflate(s, s);
             }
 
-            if (!string.IsNullOrEmpty(icon.Text))
+            if (!string.IsNullOrEmpty(icon.Text) && !IsNameHidden(icon.Entity))
                 Graphics.DrawText(icon.Text, position.Translate(0, Settings.ZForText), icon.TextColor?.ToSharpDx() ?? Color.White, FontAlign.Center);
         }
+    }
+
+    /// <summary>
+    /// Whether the entity's metadata matches an "always hidden monster names" pattern. Checked when
+    /// drawing, so a new pattern applies without resetting icons. Metadata, not Path: Path carries
+    /// the monster level on the end ("...@83"), which an anchored pattern would never match.
+    /// </summary>
+    private bool IsNameHidden(Entity entity)
+    {
+        var patterns = Settings.IconsBuilderSettings.AlwaysHiddenMonsterNames.Content;
+        if (patterns.Count == 0 || entity == null)
+            return false;
+
+        var metadata = entity.Metadata;
+        if (string.IsNullOrEmpty(metadata))
+            return false;
+
+        foreach (var pattern in patterns)
+        {
+            if (string.IsNullOrWhiteSpace(pattern?.Value))
+                continue;
+
+            try
+            {
+                if (global::MinimapIcons.IconsBuilder.IconsBuilder.GetRegex(pattern.Value).IsMatch(metadata))
+                    return true;
+            }
+            catch (ArgumentException)
+            {
+                // A pattern half typed into the box is not a match, and must not throw every frame.
+            }
+        }
+
+        return false;
     }
 
     private const float CameraAngle = 38.7f * MathF.PI / 180;
