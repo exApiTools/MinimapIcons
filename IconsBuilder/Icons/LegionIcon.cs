@@ -66,9 +66,13 @@ public class LegionIcon : BaseIcon
         var isChest = entity.Path.StartsWith(ChestPathPrefix, StringComparison.Ordinal);
         if (isChest || Rarity == MonsterRarity.Unique)
         {
-            MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeGreenSquare);
-            MainTexture.Color = Color.LimeGreen;
-            Hidden = () => false;
+            // Chests get a green square, and uniques the same icon as any other unique monster
+            (MainTexture.UV, MainTexture.Color) = isChest
+                ? (SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeGreenSquare), Color.LimeGreen)
+                : (SpriteHelper.GetUV(MapIconsIndex.LootFilterLargeWhiteHexagon), Color.DarkOrange);
+            // Uniques keep the "hidden" marker other buried monsters get
+            if (isChest)
+                Hidden = () => false;
             if (isChest && settings.LegionSettings.ShowChestNames ||
                 !isChest && settings.LegionSettings.ShowUniqueMonsterNames)
                 Text = entity.RenderName;
