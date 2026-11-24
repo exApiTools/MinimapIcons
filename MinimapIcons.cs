@@ -317,13 +317,13 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
     }
 
     /// <summary>
-    /// Whether the entity's metadata matches a "Hide names for" pattern. Checked when drawing, so a
-    /// new pattern applies without resetting icons. Metadata, not Path: Path carries the monster
-    /// level on the end ("...@83"), which an anchored pattern would never match.
+    /// Whether the entity's metadata matches an "always hidden monster names" pattern. Checked when
+    /// drawing, so a new pattern applies without resetting icons. Metadata, not Path: Path carries
+    /// the monster level on the end ("...@83"), which an anchored pattern would never match.
     /// </summary>
     private bool IsNameHidden(Entity entity)
     {
-        var patterns = Settings.IconsBuilderSettings.MonsterRarityNames.HideNamesFor.Content;
+        var patterns = Settings.IconsBuilderSettings.AlwaysHiddenMonsterNames.Content;
         if (patterns.Count == 0 || entity == null)
             return false;
 
