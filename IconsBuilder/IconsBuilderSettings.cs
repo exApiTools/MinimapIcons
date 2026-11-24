@@ -110,11 +110,23 @@ public class IconsBuilderSettings
 [Submenu(CollapsedByDefault = false)]
 public class LegionSettings
 {
-    [Menu(null, "Disabling this means legion monsters are treated as any other monster")]
+    [Menu(null, "Disabling this means legion monsters are treated as any other monster, and none of the other settings in this menu are applied")]
     public ToggleNode ProcessSeparately { get; set; } = new ToggleNode(true);
     public ToggleNode ShowUniqueMonsterNames { get; set; } = new ToggleNode(true);
     public ToggleNode ShowChestNames { get; set; } = new ToggleNode(true);
     public ToggleNode ShowMonsterRewards { get; set; } = new ToggleNode(true);
+    [Menu("Hide Buried Legion Monsters")]
+    public LegionBuriedMonsterSettings HideBuriedMonsters { get; set; } = new LegionBuriedMonsterSettings();
+    public ToggleNode HideLegionChests { get; set; } = new ToggleNode(true);
+}
+
+[Submenu(CollapsedByDefault = false)]
+public class LegionBuriedMonsterSettings
+{
+    public ToggleNode Normal { get; set; } = new ToggleNode(true);
+    public ToggleNode Magic { get; set; } = new ToggleNode(true);
+    public ToggleNode Rare { get; set; } = new ToggleNode(false);
+    public ToggleNode Unique { get; set; } = new ToggleNode(false);
 }
 
 
