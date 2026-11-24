@@ -199,11 +199,47 @@ public class MinimapIcons : BaseSettingsPlugin<MapIconsSettings>
 
             var baseIcons = entitySource?.Select(x => x.GetHudComponent<BaseIcon>())
                 .Where(icon => icon != null)
+                .Where(icon => !IsAlwaysIgnored(icon.Entity))
                 .Where(icon => (!icon.Entity.Path.Contains("Breach/Monsters") && !icon.Entity.Path.Contains("Chests/breach")) || Settings.CacheBreachEntities || icon.Entity.IsValid)
                 .OrderBy(x => x.Priority)
                 .ToList();
             return baseIcons ?? [];
         }, Settings.IconListRefreshPeriod);
+    }
+
+    /// <summary>
+    /// Entities whose metadata matches one of the "always ignore" patterns never get an icon.
+    /// Plain text matches anywhere in it, so "^...$" pins it to one exact path. Matched against
+    /// Metadata, not Path: Path carries the monster level on the end ("...@83"), which an anchored
+    /// pattern would never match.
+    /// </summary>
+    public bool IsAlwaysIgnored(Entity entity)
+    {
+        var patterns = Settings.AlwaysIgnoreMinimapIcons.Content;
+        if (patterns.Count == 0 || entity == null)
+            return false;
+
+        var metadata = entity.Metadata;
+        if (string.IsNullOrEmpty(metadata))
+            return false;
+
+        foreach (var pattern in patterns)
+        {
+            if (string.IsNullOrWhiteSpace(pattern?.Value))
+                continue;
+
+            try
+            {
+                if (global::MinimapIcons.IconsBuilder.IconsBuilder.GetRegex(pattern.Value).IsMatch(metadata))
+                    return true;
+            }
+            catch (ArgumentException)
+            {
+                // A pattern half typed into the box is not a match, and must not throw every frame.
+            }
+        }
+
+        return false;
     }
 
     public override Job Tick()
