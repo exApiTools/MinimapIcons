@@ -125,6 +125,21 @@ public class MonsterNameSettings
     public ToggleNode ShowMagicNames { get; set; } = new ToggleNode(false);
     public ToggleNode ShowRareNames { get; set; } = new ToggleNode(false);
     public ToggleNode ShowUniqueNames { get; set; } = new ToggleNode(true);
+
+    [Menu("Hide names for", "Metadata patterns of entities whose names are never drawn. Their icons still are.", CollapsedByDefault = true)]
+    public ContentNode<TextNode> HideNamesFor { get; set; } =
+        new ContentNode<TextNode>()
+        {
+            Content =
+            [
+                // Unique-rarity orbs that come in groups, so their names can cover the map
+                new TextNode("^Metadata/Monsters/VolatileCore/"), // "Rare Monsters have Volatile Cores"
+                new TextNode("^Metadata/Monsters/LeagueArchnemesis/LivingCrystal"),
+            ],
+            EnableControls = true,
+            ItemFactory = () => new TextNode(""),
+            UseFlatItems = true,
+        };
 }
 
 [Submenu]
