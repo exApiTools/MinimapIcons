@@ -52,6 +52,9 @@ public class MapIconsSettings : ISettings
         {
             Content =
             [
+                // Unique-rarity orbs that come in groups and would otherwise draw as unique monster icons
+                new TextNode("^Metadata/Monsters/VolatileCore/"), // "Rare Monsters have Volatile Cores"
+                new TextNode("^Metadata/Monsters/LeagueArchnemesis/LivingCrystal"),
             ],
             EnableControls = true,
             ItemFactory = () => new TextNode(""),
