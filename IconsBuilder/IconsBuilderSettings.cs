@@ -133,7 +133,7 @@ public class LegionSettings
     public ToggleNode ShowMonsterRewards { get; set; } = new ToggleNode(true);
     [Menu("Hide Buried Legion Monsters")]
     public LegionBuriedMonsterSettings HideBuriedMonsters { get; set; } = new LegionBuriedMonsterSettings();
-    public ToggleNode HideLegionChests { get; set; } = new ToggleNode(true);
+    public ToggleNode HideLegionChests { get; set; } = new ToggleNode(false);
 }
 
 [Submenu(CollapsedByDefault = false)]
