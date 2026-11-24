@@ -25,7 +25,7 @@ public class IconsBuilderSettings
     public ToggleNode HideBuriedBreachMonsters { get; set; } = new ToggleNode(false);
     public MonsterNameSettings MonsterRarityNames { get; set; } = new MonsterNameSettings();
 
-    [Menu(null, "Metadata patterns of monsters whose names are never drawn. Their icons still are.", CollapsedByDefault = true)]
+    [Menu(null, CollapsedByDefault = true)]
     public ContentNode<TextNode> AlwaysHiddenMonsterNames { get; set; } =
         new ContentNode<TextNode>()
         {
