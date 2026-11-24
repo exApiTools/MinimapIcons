@@ -55,7 +55,6 @@ public class MapIconsSettings : ISettings
     public static readonly string[] AlwaysIgnoreDefaults =
     [
         // Unique-rarity orbs that come in groups and would otherwise draw as unique monster icons
-        "^Metadata/Monsters/VolatileCore/", // "Rare Monsters have Volatile Cores"
         "^Metadata/Monsters/LeagueArchnemesis/LivingCrystal",
     ];
 
